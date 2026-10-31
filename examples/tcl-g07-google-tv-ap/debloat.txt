@@ -1,0 +1,66 @@
+# TCL Smart TV (reports as "Smart TV"; device G07, product G07_4K_GB_NF, Realtek RTD2851A), Google TV on
+# Android 11 (SDK 30), build RP1A.200622.001 AR07, software V8-R51AT01-LF1V098, client TCL-AP-RTD51A-S1,
+# security patch 2023-10-05, 2 GB RAM, armeabi-v7a. Fingerprint TCL/G07_4K_GB_NF/G07:11/RP1A.200622.001/AR07.
+#
+# Apply:   TV_HOST=<tv ip> tools/disable.sh examples/tcl-g07-google-tv-ap/debloat.txt
+# Undo:    TV_HOST=<tv ip> tools/restore.sh examples/tcl-g07-google-tv-ap/debloat.txt com.google.android.apps.tv.launcherx
+# Everything is DISABLED, not uninstalled. Comment out any line you want to keep.
+#
+# A conservative cut of examples/tcl-g07-google-tv for an owner who keeps firmware updates, voice and
+# casting. Kept on purpose: com.tcl.ttvs and com.tcl.useragreement (firmware updates), Chromecast
+# (com.google.android.apps.mediashell, listening on 8008/8009), voice (com.google.android.katniss,
+# com.tcl.assistant, com.google.android.tv.assistant), MagiConnect (com.tcl.MultiScreenInteraction_TV),
+# T-Solo, com.tcl.gallery, com.tcl.ui_mediaCenter, YouTube Music and com.google.android.videos (it holds a
+# TvInputService). com.tcl.channelplus, com.tcl.hotelmenu and com.iqiyi.i18n.tv are not installed here.
+#
+# Stock launcher: com.google.android.apps.tv.launcherx. setupwraith's RecoveryActivity claims HOME at
+# priority 1 once launcherx is off; `cmd package set-home-activity` alone does not beat launcherx
+# (priority 2), so the order was: install the other launcher, disable launcherx, then setupwraith.
+# All eight saved Wi-Fi networks belonged to android.uid.system (`dumpsys wifi`, cname=), and the TV was
+# on Ethernet, so disabling setupwraith kept every network.
+#
+# Tested 2026-10-31 on one TV in Russia, applied one package at a time with screenshots between batches,
+# then one reboot. With the other launcher as Home: the Input key (KEYCODE_TV_INPUT) opens the source
+# panel (com.tcl.tv) with TV, HDMI 1-3 and AV; 8008/8009 still listen after the reboot; ADB on 5555
+# comes back by itself (this firmware sets service.adb.tcp.port=5555, persist.adb.tcp.port is empty).
+# Reboot: every package below stayed disabled except com.tcl.notereminder and com.tcl.usercenter, which
+# AR07 re-enables at boot (as on the Brazil AR07 units in examples/tcl-g07-google-tv). They stay listed
+# so a re-run catches them; hide them in the launcher instead of fighting the firmware.
+# Screensaver: dreamx off; another launcher's DreamService set with
+# `settings put secure screensaver_components <pkg>/<service>` started through Somnambulator.
+#
+# DO NOT DISABLE: com.tcl.tv (Live TV, HDMI playback, the source panel), com.tcl.tvinput (tuner, HDMI and
+# AV inputs), com.tcl.suspension (Quick Panel), com.tcl.keyhelp, com.tcl.inputmethod.international (the
+# keyboard), com.tcl.settings, com.tcl.system.server, com.tcl.initsetup, com.tvos.
+# Already disabled at the factory: au.com.stan.and, com.amazon.amazonvideo.livingroom, com.tcl.smartalexa,
+# tv.wuaki.apptv.
+
+# 1. Telemetry and analytics (ttvs and useragreement kept for firmware updates)
+com.tcl.guard                              # TGuard device-use tracking, cleaner (persistent)
+com.google.android.feedback
+com.google.android.partnersetup
+com.google.android.onetimeinitializer
+
+# 2. Content and ad services
+com.tcl.waterfall.overseas                 # content "waterfall" recommendations
+com.tcl.dashboard                          # TCL Home panel, promos
+com.tcl.partnercustomizer                  # TCL tweaks to Google TV home rows
+com.tcl.messagebox                         # pushed messages and promos
+com.tcl.notereminder                       # reminders; re-enabled at boot on AR07
+com.tcl.tv.tclhome_passive                 # TCL home content, starts at boot
+com.tcl.usercenter                         # TCL account; re-enabled at boot on AR07
+com.tcl.esticker                           # retail-demo sticker
+android.autoinstalls.config.google.gtvpai  # partner app auto-installs
+
+# 3. Background services (off by choice)
+com.tcl.miracast                           # Miracast sink; Chromecast kept. com.tcl.suspension names its
+                                           # DUAL/MULTI/TV_MULTI actions, which no package resolves even before
+com.tcl.android.webview                    # TCL support browser (the system WebView is Google's)
+com.google.android.syncadapters.calendar
+
+# 4. Preloaded apps (off by choice)
+com.google.android.play.games
+
+# 5. Launcher handover. Ambient mode replaced by the other launcher's screensaver.
+com.google.android.tungsten.setupwraith
+com.google.android.apps.tv.dreamx          # ambient-mode screensaver
