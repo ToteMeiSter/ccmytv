@@ -20,6 +20,8 @@
 # Status: disabled on one TV on 2026-10-31, one package per shell call with dumpsys read-back, after a
 # third-party launcher had taken Home. Reboot-checked twice: everything stayed disabled, the new launcher
 # was on screen at power-on, port 5555 came back by itself. Hours of use, not days: a starting point.
+# com.oneway.tv.core.services was added later the same day and reboot-checked once: still disabled, its
+# persistent process starts empty (no analytics or crash service running).
 # See README.md in this folder for what was kept and why.
 
 # Dead weight on a TV (same entries as examples/toshiba-65ua2363dg, also MediaTek m7332)
@@ -30,3 +32,7 @@ com.android.se                                   # Secure Element (eSIM, NFC pay
 
 # Stock launcher. Disable it only after another launcher owns Home: tools/disable.sh skips it otherwise.
 com.oneway.tv.home
+
+# Manufacturer telemetry: analytics (remote keys, Live TV viewing) and crash upload. The package holds
+# nothing else; single components are refused for the shell. See README.md, "Manufacturer telemetry".
+com.oneway.tv.core.services

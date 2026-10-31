@@ -24,7 +24,6 @@ ad apps already ship disabled (list in the `debloat.txt` header), so the list it
 | `com.oneway.tv` | Every TvInputService: analog, DVB-T/C/S, HDMI, composite, component | `pm query-services --components -a android.media.tv.TvInputService` |
 | `com.oneway.tv.live` | Live TV ("Эфирное ТВ"), the only Live TV app | LEANBACK_LAUNCHER entry `.playback.TvPlaybackActivity` |
 | `com.oneway.tv.inputchooser` | Input menu. The remote's Input key (`KEYCODE_TV_INPUT`) opens it over any launcher | `mCurrentFocus` = `TvInputChooserActivity` after the key, with a third-party Home |
-| `com.oneway.tv.core.services` | Persistent system service (uid 1000) under the shell | `flags=[ SYSTEM PERSISTENT ]` |
 | `com.oneway.updater` | Firmware updates (OTA) | owner's choice |
 | `com.oneway.tv.onetimeinit` | First-boot setup; not proven safe to disable | - |
 | `com.mediatek.tv.service`, `com.mediatek.loadingequalizer` | TV middleware (the core guard refuses `com.mediatek.tv.service`) | - |
@@ -38,6 +37,33 @@ ad apps already ship disabled (list in the `debloat.txt` header), so the list it
 No Google Cast receiver exists on this firmware: no `mediashell`, ports 8008/8009 refuse, and
 `dumpsys media_router` lists no providers. "Casting" from a phone goes through DLNA (EDLNA), DIAL
 (YouTube) or EShare.
+
+## Manufacturer telemetry
+
+`com.oneway.tv.core.services` (OneCoreServices 1.1.22, priv-app, persistent, uid 1000) is the vendor's
+telemetry and nothing else. Its manifest has three components: `.metric.analytica.OneAnalyticaService`
+(myTracker events with the serial number, Android ID and the public IP from `api.ipify.org`),
+`.metric.crash.CrashReportService` (every DropBox entry to the vendor's crash endpoint) and
+`.BootCompletedReceiver` (starts both). No activity, no provider, no shared process.
+
+What feeds it:
+
+- `services.jar` `OneMetricManager`, called from `OnePhoneWindowManager.interceptKeyBeforeDispatching`:
+  every remote key release, with the key code and the input device name.
+- `com.oneway.tv.live`: channel and programme names when watching, favourites, scan prompts.
+
+Disabling single components is refused for the shell
+(`SecurityException: Shell cannot change component state`), so the list disables the package. Both
+callers survive it: `OneMetricManager` unbinds and returns when `bindService` fails (four key presses,
+`system_server` kept its pid), and Live TV gives up after three bind attempts. The other uid 1000
+packages (Settings, `com.mediatek.tv.service`, the updater, inputs, EShare) stay enabled.
+
+`am force-stop` does not stop a persistent process, and `am crash` gets it restarted with its
+services. It goes away at the next reboot.
+
+Left alone, because they belong to features: OTA (`com.oneway.updater`), the Settings promotion
+request (same host as OTA), EShare/EDLNA update and licence checks, ad pings inside the YouTube client.
+A DNS block of the tracker hosts would also work; it is not part of this list.
 
 ## Third-party launcher
 

@@ -2,5 +2,5 @@
   "tv": "Kvant TV (TV_PCB_KV9632, Ozon firmware, MediaTek m7332)",
   "os": "Android TV 11",
   "brand": "Kvant",
-  "notes": "No GMS, no Google Cast receiver (8008/8009 closed); OneWay shell, Ozon overlays; the ad and partner apps ship disabled, so the list is short: AOSP dead weight and the stock launcher once another launcher owns Home; EShare/EDLNA, DIAL, OneTube, OTA, Live TV and inputs kept; input key opens com.oneway.tv.inputchooser over any launcher; reboot-checked twice"
+  "notes": "No GMS, no Google Cast receiver (8008/8009 closed); OneWay shell, Ozon overlays; the ad and partner apps ship disabled, so the list is short: AOSP dead weight, the vendor telemetry package (com.oneway.tv.core.services: remote keys, Live TV viewing, crash upload) and the stock launcher once another launcher owns Home; EShare/EDLNA, DIAL, OneTube, OTA, Live TV and inputs kept; input key opens com.oneway.tv.inputchooser over any launcher; reboot-checked twice"
 }
