@@ -58,3 +58,31 @@ for `proc_stat`): a launcher's CPU meter has nothing to show here.
 No pictures are kept in this folder (licences and size). A local photo slideshow works from shared
 storage: push your own folder with `adb push <folder>/. /sdcard/Pictures/Wallpapers/` and, on Android 11,
 grant the launcher `android.permission.READ_EXTERNAL_STORAGE` with `pm grant` if it reads that folder.
+
+## Known issues
+
+### Live TV crashes when an HDMI input has no signal (firmware defect)
+
+This is a firmware bug, not a result of the cleanup. Do not re-enable packages to fix it.
+
+- The Input menu (`com.oneway.tv.inputchooser`, the remote's Input key) opens an input with VIEW
+  `content://android.media.tv/passthrough/com.oneway.tv%2F.hdmi.HDMIInputService%2FHW<N>` in
+  `com.oneway.tv.live/.playback.InputPlaybackActivity`.
+- If that HDMI port has no signal (`dumpsys tv_input` shows `state: 1`, `CONNECTED_STANDBY`),
+  Live TV ("Эфирное ТВ") crashes: `NullPointerException` in
+  `com.oneway.tv.live.view.PlaybackView$b.onVideoUnavailable` (its `TvPlaybackActivity` field is
+  not initialised).
+- Re-enabling the stock launcher `com.oneway.tv.home` does not stop the crash (checked). No link to
+  disabling the launcher was found.
+- The same URI opened with the explicit component `TvPlaybackActivity` does not crash:
+  `am start -a android.intent.action.VIEW -d "<uri>" -n com.oneway.tv.live/.playback.TvPlaybackActivity`.
+- Workaround: use a launcher that opens inputs through `com.oneway.tv.live/.playback.TvPlaybackActivity`.
+
+### Arc screensaver cannot be selected in Settings (Arc before 1.2.0-mgd.12)
+
+Before build 4138, Arc's `screensaver.xml` declared a `settingsActivity` that does not exist, and
+TvSettings crashed before it saved the choice. From 4138 the choice works. On older builds set it
+over adb:
+`adb shell settings put secure screensaver_components ru.mgdatv.arc/com.omeda.arc.ClockScreensaverService`
+and `adb shell settings put secure screensaver_enabled 1`. Check with
+`adb shell dumpsys dreams | grep mCurrentDreamName` while the screensaver runs.
