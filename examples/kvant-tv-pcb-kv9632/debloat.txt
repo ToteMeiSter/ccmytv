@@ -1,0 +1,38 @@
+# Kvant TV (board TV_PCB_KV9632, manufacturer Kvant_Ltd, MediaTek m7332), Android TV 11 (API 30), Ozon firmware
+# build 1313. Fingerprint MediaTek/m7332_eu/m7332:11/ozon/1313, user build, ro.adb.secure=1, SELinux enforcing.
+# 1920x1080, about 1.4 GB RAM (MemTotal 1418468 kB), armeabi-v7a only. No Google Play / GMS at all.
+#
+# Apply:   TV_HOST=<tv ip> tools/disable.sh examples/kvant-tv-pcb-kv9632/debloat.txt
+# Undo:    TV_HOST=<tv ip> tools/restore.sh examples/kvant-tv-pcb-kv9632/debloat.txt com.oneway.tv.home
+# Everything is DISABLED, not uninstalled. Comment out any line you want to keep.
+#
+# Stock launcher: com.oneway.tv.home (OneWay "OneTvHome" with the Ozon overlay). Only it and
+# com.android.tv.settings/.system.FallbackHome answer HOME; there is no setupwraith on this firmware.
+# Live TV app:    com.oneway.tv.live ("Эфирное ТВ"). Inputs: com.oneway.tv (all TvInputService: analog,
+#                 DVB-T/C/S, HDMI, composite, component). Input menu: com.oneway.tv.inputchooser.
+# Updates:        com.oneway.updater (OTA). Kept.
+#
+# Shipped disabled (found so on the TV before any change, not touched, restore.sh leaves them as they are):
+# ag.tv.a24h, com.oneway.tv.factory.menu, ru.mail.channel.voiceservice, com.oneway.tv.filemanager,
+# one.premier.rustoretv, ru.ozon.tv, com.yandex.browser.tv, org.videolan.vlc, com.ecloud.eairplay,
+# com.oneway.tv.suw, com.oneway.onefactorytest.
+#
+# Status: disabled on one TV on 2026-10-31, one package per shell call with dumpsys read-back, after a
+# third-party launcher had taken Home. Reboot-checked twice: everything stayed disabled, the new launcher
+# was on screen at power-on, port 5555 came back by itself. Hours of use, not days: a starting point.
+# com.oneway.tv.core.services was added later the same day and reboot-checked once: still disabled, its
+# persistent process starts empty (no analytics or crash service running).
+# See README.md in this folder for what was kept and why.
+
+# Dead weight on a TV (same entries as examples/toshiba-65ua2363dg, also MediaTek m7332)
+com.android.dynsystem                            # Dynamic System Updates
+com.android.cts.ctsshim                          # Android test shim
+com.android.cts.priv.ctsshim                     # Android test shim
+com.android.se                                   # Secure Element (eSIM, NFC payments); no such radio here
+
+# Stock launcher. Disable it only after another launcher owns Home: tools/disable.sh skips it otherwise.
+com.oneway.tv.home
+
+# Manufacturer telemetry: analytics (remote keys, Live TV viewing) and crash upload. The package holds
+# nothing else; single components are refused for the shell. See README.md, "Manufacturer telemetry".
+com.oneway.tv.core.services
