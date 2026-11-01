@@ -24,7 +24,27 @@ lists what stays.
   package resolves those actions even with Miracast enabled, so disabling `com.tcl.miracast` does not
   break the panel.
 
+## Known issues
+
+- **Guide and Gear keys need launcherx.** This remote has no Netflix or YouTube key. Its Guide key
+  (the "chart" icon, scan code 4001) goes through `com.tcl.tv/.service.GlobalKeyService`, which sends
+  `KEYCODE_GUIDE`; the global key map (`dumpsys window policy`, mKeyMapping) delivers that only to
+  `launcherx/.remotecontrol.GlobalKeyListener_Receiver`, before any app sees it. The Gear key (4077)
+  opens the Google TV panel, which launcherx draws. With launcherx disabled both keys do nothing, and
+  another launcher cannot remap them. Without root you cannot keep launcherx and drop only its Home:
+  `pm disable --user 0 com.google.android.apps.tv.launcherx/.home.HomeActivity` fails with
+  `SecurityException: Shell cannot change component state`, and an enabled launcherx takes Home back
+  at once (priority 2). Pick one: the keys or a third-party Home. This owner kept the third-party Home;
+  Live TV opens from the launcher's TV or input tile. The ivi, Okko, Kinopoisk and Media keys start
+  their apps directly and keep working.
+- **Third-party screensaver blocked by auto-start.** "Start now" and the idle timer do nothing for a
+  sideloaded DreamService: the log shows `Unable to bind dream service` and TCL's boot manager refusing
+  with `callee_does't_have_OP_AUTO_START_permission`. Allow it per package:
+  `appops set <pkg> APP_AUTO_START allow` (undo: `... ignore`).
+- **dreamx is optional.** The owner later re-enabled `com.google.android.apps.tv.dreamx` for the
+  ambient screensaver (`dreamx/.service.Backdrop`, recent photos); it did not take Home. Drop it from
+  `debloat.txt` if you want the same.
+
 ## Not checked over ADB
 
-HDMI picture, the tuner's channels, casting from a phone and the remote's Gear, Netflix and YouTube
-buttons (see `tcl-g07-google-tv` for those keys) need the real remote.
+HDMI picture, the tuner's channels and casting from a phone need the real remote.
