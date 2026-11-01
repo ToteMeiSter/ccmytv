@@ -1,0 +1,6 @@
+{
+  "tv": "TCL Smart TV (G07, G07_4K_GB_NF, AP firmware AR07, Realtek RTD2851A)",
+  "os": "Google TV 11",
+  "brand": "TCL",
+  "notes": "Conservative cut of tcl-g07-google-tv: TGuard, waterfall, TCL Home dashboard, messages, partner auto-installs, Miracast, TCL webview and Play Games off; firmware updates (ttvs), Chromecast, voice, MagiConnect, T-Solo, gallery and media player kept; launcherx, setupwraith and dreamx off (all saved Wi-Fi belonged to android.uid.system), reboot-checked once; AR07 re-enables notereminder and usercenter at boot; ADB 5555 comes back via service.adb.tcp.port"
+}
